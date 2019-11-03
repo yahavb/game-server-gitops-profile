@@ -1,7 +1,7 @@
 # EKS Quickstart Game-Server Sample
 
 This repo contains an initial set of cluster components for deploying containerized game-server to be installed and
-configured by [eksctl](https://eksctl.io) through GitOps.
+configured by [eksctl](https://eksctl.io) through GitOps. It was build based on the GitOps [tutorial](https://eksctl.io/usage/experimental/gitops-flux/#creating-your-own-quick-start-profile)
 
 ## Components
 
@@ -11,12 +11,12 @@ configured by [eksctl](https://eksctl.io) through GitOps.
 - [Grafana](https://grafana.com) -- for a rich way to visualize metrics via dashboards you can create, explore, and share.
 - [Kubernetes dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) -- Kubernetes' standard dashboard.
 - [Fluentd](https://www.fluentd.org/) & Amazon's [CloudWatch agent](https://aws.amazon.com/cloudwatch/) -- for cluster & containers' [log collection, aggregation & analytics in CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-logs.html).
-- [podinfo](https://github.com/stefanprodan/podinfo) --  a toy demo application.
 
 ## Pre-requisites
 
 A running EKS cluster with [IAM policies](https://eksctl.io/usage/iam-policies/) for:
 
+- The game-server deployment assumed an image is deployed to ECR. The game-server pipeline is defined in [containerized-game-servers](https://github.com/aws-samples/containerized-game-servers)
 - The game-server instance uses host-network:true so no ingress controller or LB is needed. 
 - The game-server pods need permisions to publish its status to an SQS queue
 - auto-scaler
@@ -29,6 +29,22 @@ Therefore, depending on your use-case, you may want to:
 
 - add these policies to all node groups,
 - add [node selectors](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) to the ALB ingress, auto-scaler and CloudWatch pods, so that they are deployed on the nodes configured with these policies.
+
+## How to deploy the template?
+
+- Populate the cluster name by replacing `{{.ClusterName}}`
+- Populate the region name by replacing `{{.Region}}` e.g. `us-west-2`
+- This example does not use Helm, hence `--with-helm=false`
+- The last argument is the profile/template repo, e.g., `git@github.com:yahavb/game-server-gitops-profile.git`
+- the `--git-url` is the destination git repo that the sys/devops will use to manage the cluster i.e. editing, adding, removing files to induce changes in the cluster. 
+
+```
+export EKSCTL_EXPERIMENTAL=true
+eksctl enable profile -r `{{.Region}}` --with-helm=false \
+--git-url git@github.com:yahavb/weave-workshop.git \
+--git-email email@me.com --cluster {{.ClusterName}} \
+git@github.com:yahavb/game-server-gitops-profile.git 
+```
 
 ## How to access workloads
 
