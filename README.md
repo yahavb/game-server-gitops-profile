@@ -1,4 +1,4 @@
-# EKS Quickstart App Dev
+# EKS Quickstart Game-Server Sample
 
 This repo contains an initial set of cluster components for deploying containerized game-server to be installed and
 configured by [eksctl](https://eksctl.io) through GitOps.
